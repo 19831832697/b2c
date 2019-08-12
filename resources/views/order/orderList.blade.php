@@ -13,16 +13,16 @@
         <td>订单号</td>
         <td>{{$order_no}}</td>
     </tr>
-{{--    @foreach($arr as $v)--}}
+    @foreach($arr as $k=>$v)
     <tr>
         <td>商品名称</td>
-{{--        <td>{{$arr['goods_name']}}</td>--}}
+        <td>{{$v['goods_name']}}</td>
     </tr>
-    {{--@endforeach--}}
     <tr>
-        <td>商品总价</td>
-{{--        <td>{{$arr->order_amount}}</td>--}}
+        <td>商品价格</td>
+        <td>{{$v['goods_price']}}</td>
     </tr>
+    @endforeach
 </table>
 <button><a href="/z_pay?order_no={{$order_no}}">立即支付</a></button>
 </body>

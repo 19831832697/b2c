@@ -81,6 +81,7 @@ class PayController extends Controller
             }
             $url = rtrim($param_str, '&');
             $url = $this->gate_way . $url;
+//            var_dump($url);die;
             return redirect($url, 302);
         }
     }
