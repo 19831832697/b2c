@@ -119,7 +119,6 @@ class OrderController extends Controller
             ->join('shop_order_detail','shop_goods.goods_id','=','shop_order_detail.goods_id')
             ->join('shop_order','shop_order.order_id','=','shop_order_detail.order_id')
             ->where($where)->get();
-//        var_dump($arrInfo);die;
         $arr = json_decode($arrInfo,true);
         return view('order.orderList',['arr'=>$arr,'order_no'=>$order_no]);
     }

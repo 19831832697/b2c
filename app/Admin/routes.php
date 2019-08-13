@@ -15,5 +15,4 @@ Route::group([
 //    $router->resource('users', UserController::class);
     $router->resource('sku', SkuController::class);
     $router->resource('goods', GoodsController::class);
-
 });
