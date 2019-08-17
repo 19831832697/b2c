@@ -65,6 +65,7 @@
         var sum=$('.sum').html();
 
         $('.box').each(function (checkbox) {
+
             if ($(this).prop('checked') == true) {
                 var total = parseInt($(this).parents('tr').find('strong').text()) + parseInt(sum);
                 $('.sum').html(total);
@@ -117,11 +118,12 @@
     })
 
     //去结算
-    $("#pay").click(function() {
+    $("#pay").click(function(){
         var goods_id = '';
         $.each($('.box:checked'), function () {
             goods_id += $(this).parents('tr').attr('goods_id') + ",";
         })
+
         total = $('.sum').text();
         $.ajax({
             url: "/orderInsert",

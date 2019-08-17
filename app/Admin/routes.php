@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Routing\Router;
+//use App\Admin\Actions\Post\Sku;
 
 Admin::routes();
 
@@ -11,8 +12,13 @@ Route::group([
 ], function (Router $router) {
 
     $router->get('/', 'HomeController@index')->name('admin.home');
-    $router->get('/sku', 'SkuController@sku')->name('admin.sku');
-//    $router->resource('users', UserController::class);
+    $router->get('sku/{id}','SkuController@skuDetail');
+    $router->get('/sku-detail-update', 'SkuController@skuUpdate');
+
+
+    $router->post('skuInsert/','SkuController@skuInsert');
+
     $router->resource('sku', SkuController::class);
     $router->resource('goods', GoodsController::class);
+
 });

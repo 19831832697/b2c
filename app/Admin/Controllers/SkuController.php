@@ -2,11 +2,17 @@
 
 namespace App\Admin\Controllers;
 
+use App\Model\GoodsAttrModel;
+use App\Model\GoodsAttrValueModel;
+use App\Model\GoodsModel;
 use App\Model\SkuModel;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class SkuController extends AdminController
 {
@@ -16,6 +22,39 @@ class SkuController extends AdminController
      * @var string
      */
     protected $title = 'App\Model\SkuModel';
+
+    /**
+     * sku
+     * @param $goods_id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function sku($id)
+    {
+        $goodsInfo = DB::table('shop_goods')->where(['goods_id'=>$id])->first();
+        return view('sku.sku',['goodsInfo'=>$goodsInfo]);
+    }
+
+    /**
+     * 添加sku
+     * @param Request $request
+     */
+    public function skuInsert(Request $request)
+    {
+        $sku = $request->input('sku');
+        $price = $request->input('price');
+        $price0 = $request->input('price0');
+        $arr = [
+            'sku'=>$sku,
+            'price'=>$price,
+            'price0'=>$price0,
+            'goods_id'=>$_POST['goods_id'],
+            'goods_sn'=>$_POST['goods_sn'],
+            'create_at'=>date('Y-m-d H:i:s',time()),
+            'update_at'=>date('Y-m-d H:i:s',time()),
+        ];
+        $skuInfo = DB::table('p_sku')->insert($arr);
+        var_dump($skuInfo);
+    }
 
     /**
      * Make a grid builder.
@@ -84,5 +123,66 @@ class SkuController extends AdminController
         $form->number('store', __('Store'));
 
         return $form;
+    }
+
+    /**
+     * 静态页面
+     * @param Content $content
+     * @param $id
+     * @return Content
+     */
+    public function skuDetail(Content $content,$id)
+    {
+        $form = new Form(new SkuModel);
+        $form->setAction('/admin/sku-detail-update?id='.$id);
+        $form->text('goods_id', __('Goods id'))->default($id);
+        $form->text('goods_sn', __('商品编号'));
+
+        //获取当前商品属性
+        $attr = GoodsModel::find($id)->toArray();
+        if($attr['attr']){
+            $attr_arr = explode(',',$attr['attr']);
+            $i = 0;
+            foreach($attr_arr as $k=>$v)
+            {
+                $attr_info = GoodsAttrModel::find($v);
+                $attr_value = GoodsAttrValueModel::select('id','title')->where(['attr_id'=>$v])->orderBy('order','asc')->get()->toArray();
+                $option = [];
+                foreach($attr_value as $k1=>$v1){
+                    $option[$v1['id']] = $v1['title'];
+                }
+                $form->select('attr'.$i, __($attr_info->title))->options($option);
+                $i++;
+            }
+        }
+
+        $form->text('sku', __('Sku'));
+        $form->number('price0', __('定价'));
+        $form->number('price', __('售价'));
+        $form->number('store', __('库存'));
+
+        return $content->body($form);
+    }
+
+    /**
+     * sku添加执行
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function skuUpdate()
+    {
+        $attr_path = '';
+        for($i=0;$i<3;$i++)
+        {
+            if(isset($_GET['attr'.$i])){
+                $attr_path .= $_GET['attr'.$i] . ',';
+                unset($_GET['attr'.$i]);
+            }
+        }
+
+        $_GET['attr_path'] = rtrim($attr_path,',');
+        unset($_GET['_token']);
+        SkuModel::insert($_GET);
+        admin_toastr('添加成功','success');
+        return redirect('/admin/sku-detail/'.$_GET['id']);
     }
 }
